@@ -19,21 +19,36 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                     <Progress value={50} size='xs' colorScheme='green' />
                 </ModalHeader>
                 <ModalBody justifyContent={'center'}>
-                    <Divider />
+                <Divider />
                     <FormControl isRequired>
                         <Stack spacing={2}>
-                            <FormLabel>Fill out Business details</FormLabel>
+                            <Text textAlign={'center'}>Business Information</Text>
+                            <FormLabel>Business Legal Name</FormLabel>
                             <Input type="text" placeholder="Business Legal Name"/>
+                            <FormLabel>License Number</FormLabel>
                             <Input type="text" placeholder="License Number"/>
-                            <FormLabel>Issuance Date</FormLabel>
-                            <Input type="date" placeholder="Issuance Date"/>
-                            <FormLabel>Expiry Date</FormLabel>
-                            <Input type="date" placeholder="Expiry Date"/>
+                            <FormLabel>Tax Identification Number</FormLabel>
                             <Input type="text" placeholder="Tax Identification Number"/>
+                            <FormLabel>Mailing Address</FormLabel>
                             <Input type="email" placeholder="Mailing Address"/>
+                            <FormLabel>City</FormLabel>
                             <Input type="text" placeholder="City"/>
+                            <FormLabel>Zip Code</FormLabel>
                             <Input type="text" placeholder="Zip Code"/>
-                            <Button color="white" backgroundColor={"green.400"} variant={'solid'}>Autofill with Business License VC</Button>
+                            <Button mb={4} color="white" backgroundColor={"green.400"} variant={'solid'}>Autofill with Business License VC</Button>
+                        </Stack>
+                    </FormControl>
+                    <FormControl>
+                        <Stack spacing={2}>   
+                            <Divider border='2px solid #FOBD3F'></Divider> 
+                            <Text textAlign={'center'}>Financial Information</Text>
+                            <FormLabel>Gross Profit</FormLabel>
+                            <Input type="text" placeholder="$"/>
+                            <FormLabel>Operating Expenses</FormLabel>
+                            <Input type="text" placeholder="$"/>
+                            <FormLabel>Net Income</FormLabel>
+                            <Input type="text" placeholder="$"/>
+                            <Button mb={4} color="white" backgroundColor={"green.400"} variant={'solid'}>Autofill with Business License VC</Button>
                         </Stack>
                     </FormControl>
                 </ModalBody>
