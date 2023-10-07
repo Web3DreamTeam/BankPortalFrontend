@@ -90,7 +90,7 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                             <Input variant={identityCredentialsData ? 'filled' : 'outline'} defaultValue={identityCredentialsData ? identityCredentialsData.lastName : ''} type="text" placeholder="Fischer"/>
                             <FormLabel>Date of Birth</FormLabel>
                             <Input variant={identityCredentialsData ? 'filled' : 'outline'} defaultValue={identityCredentialsData ? parseDateOfBirth(identityCredentialsData.dateOfBirth) : ''} type="text"/>
-                            <Button variant={identityCredentialsData ? 'outline' : 'solid'} isDisabled={!!identityCredentialsData} onClick={() => handleAutofill("PassportCredential")} mb={4} colorScheme={'green'} >{identityCredentialsData ? 'Identity Verified': 'Autofill with Identity VC'}</Button>
+                            <Button variant={identityCredentialsData ? 'outline' : 'solid'} isDisabled={!!identityCredentialsData} onClick={() => handleAutofill("PassportCredential")} mb={4} backgroundColor={'whitesmoke'} color={'#261803'} >{identityCredentialsData ? 'Identity Verified': 'Autofill with Identity VC'}</Button>
                         </Stack>
                     </FormControl>
                         <Divider border='2px solid #FOBD3F'></Divider>
@@ -108,7 +108,7 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                             <Input variant={addressCredentialsData ? 'filled' : 'outline'} defaultValue={addressCredentialsData ? addressCredentialsData.address : ''} type="text" placeholder="7th Avenue"/>
                             <FormLabel>Zip Code</FormLabel>
                             <Input variant={addressCredentialsData ? 'filled' : 'outline'} defaultValue={addressCredentialsData ? addressCredentialsData.zipCode : ''} type="text" placeholder="M5H 2X4"/>
-                            <Button variant={addressCredentialsData ? 'outline' : 'solid'} isDisabled={!!addressCredentialsData} onClick={() => handleAutofill("UtilityBillCredential")} mb={4}  colorScheme={"green"}> Autofill with Address VCs</Button>
+                            <Button variant={addressCredentialsData ? 'outline' : 'solid'} isDisabled={!!addressCredentialsData} onClick={() => handleAutofill("UtilityBillCredential")} mb={4}  backgroundColor={'whitesmoke'} color={'#261803'}> Autofill with Address VCs</Button>
                             </Stack>
                         </FormControl>
                         <FormControl isRequired>
@@ -121,12 +121,12 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                                 <Input variant={employmentCredentialsData ? 'filled' : 'outline'} defaultValue={employmentCredentialsData ? employmentCredentialsData.jobTitle : ''} type="text" placeholder="Data Analyst"/>
                                 <FormLabel>Salary</FormLabel>
                                 <Input variant={employmentCredentialsData ? 'filled' : 'outline'} defaultValue={employmentCredentialsData ? parseDollarAmount(employmentCredentialsData.salary) : ''} type="text" placeholder="$"/>
-                                <Button variant={employmentCredentialsData ? 'outline' : 'solid'} isDisabled={!!employmentCredentialsData} onClick={() => handleAutofill("EmploymentCredential")} color="white" colorScheme={"green"}>Autofill with Employment VCs</Button>
+                                <Button variant={employmentCredentialsData ? 'outline' : 'solid'} isDisabled={!!employmentCredentialsData} onClick={() => handleAutofill("EmploymentCredential")} backgroundColor={'whitesmoke'} color={'#261803'}>Autofill with Employment VCs</Button>
                             </Stack>
                         </FormControl>
                         <FormControl mt={5} isRequired>
                             <Stack spacing={2}>
-                                <Button isDisabled={progress < 99} onClick={handleSubmitApplication} mb={4} color="blue.400" backgroundColor={"white"} variant={'outline'}>Submit Application</Button>
+                                <Button isDisabled={progress < 99} onClick={handleSubmitApplication} mb={4} color={'#261803'} backgroundColor={"white"} variant={'outline'}>Submit Application</Button>
                             </Stack>
                         </FormControl>
                     </div> : 

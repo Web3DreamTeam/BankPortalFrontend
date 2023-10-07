@@ -64,6 +64,25 @@ export const verifyCredentials = async (presentationID:string) => {
     return obj; 
 }
 
+export const getBalance = async (did:string) => {
+    const url = agentAPIUrl+'/get-balance/'+did; 
+
+    const response = await axios.get(url); 
+    if(response.status === 200) {
+        return response.data.balance; 
+    }
+}
+
+export const login = async (username:string, password:string) => {
+    const url = agentAPIUrl+'/login'; 
+
+    const response = await axios.post(url, {username:username, password:password}); 
+    if(response.status === 200) {
+        return response.data.did; 
+    }
+}
+
+
 
 
 

@@ -54,17 +54,15 @@ const VerificationModal = ({isOpen, onClose, getCredentialType, setVCData}:Verif
             <ModalContent>
                 <ModalHeader>
                 <Flex w='100%' justify='space-between'>
-                    <Text fontWeight='bold'>Autofill your information with VCs</Text>
+                    <Text fontWeight='bold'>Verification Process</Text>
                     <Button onClick={onClose} variant='close'>Close</Button>
                     </Flex>
-                    <Divider border='2px solid #FOBD3F'></Divider>
-                    <Progress value={50} size='xs' colorScheme='green' />
                 </ModalHeader>
                 <ModalBody justifyContent={'center'}>
                 <Divider border='2px solid #FOBD3F'></Divider>
                     <FormControl isRequired>
                         <Stack spacing={2}>
-                        <Text fontWeight={'bold'} textAlign={'center'}>Verification Process</Text>
+                        <Text fontWeight={'bold'} textAlign={'center'}>Follow the Instructions</Text>
                             {(!qrData && !verified) &&
                             <Flex justifyContent={'center'} flexDirection={'column'}>
                                 <FormLabel>Username</FormLabel>

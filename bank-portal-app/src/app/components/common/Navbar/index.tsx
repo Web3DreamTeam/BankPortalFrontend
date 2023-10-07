@@ -1,27 +1,41 @@
 'use client'
-import React, { useState } from "react";
-import {Button, Flex, Image } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import {Button, Divider, Flex, Image, Text } from "@chakra-ui/react";
 import Link from "next/link";
+import UserModal from "./UserModal";
 import LoginModal from "./LoginModal";
+import { BiLogIn, BiUserCircle } from "react-icons/bi";
+import { useDIDContext } from "@/app/context";
 
 const Navbar = () => {
 
+    const {did} = useDIDContext(); 
+    const [isUserModalOpen, setIsUserModalopen] = useState(false); 
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); 
 
-    const handleLogin = () => {
-        setIsLoginModalOpen(true);
-    }
+    useEffect(() => {
+        console.log(did);
+    },[did])
 
     return (
         <Flex w={'100%'} boxShadow={'xl'} height={"10vh"}>
-            <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)}/>
-            <Flex w={'100%'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
-                <Flex alignItems={'center'}>
-                    <Link href="/"><Image ml={5} height={"8vh"} src="/logo.jpg" alt="Logo"></Image></Link>
-                    <Button ml={'90vw'} onClick={handleLogin} variant={'outline'} colorScheme={'messenger'}>Login</Button>
+        <UserModal isOpen={isUserModalOpen} onClose={() => setIsUserModalopen(false)}/>
+        <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)}/>
+        <Flex w={'100%'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
+            <Flex alignItems={'center'} justifyContent={'space-between'}>
+                <Flex flexDirection={'column'}>
+                    <Divider w={'72%'} ml={12} border={'8px solid'} color={'#261803'}/>
+                    <Text fontWeight={'light'} ml={12} mb={2} fontSize={32} fontFamily={'Times New Roman'} color={'#261803'}>J.P.MORGAN</Text>
                 </Flex>
+                {
+                    !did ? 
+                    <Button leftIcon={<BiLogIn/>} onClick={() => setIsLoginModalOpen(true)}  ml={'80vw'} color={'#261803'}>Login</Button> 
+                : 
+                    <Button leftIcon={<BiUserCircle/>} onClick={() => setIsUserModalopen(true)} ml={'80vw'} color={'#261803'}>Profile</Button>
+                }
             </Flex>
         </Flex>
+    </Flex>
     ); 
 }
 

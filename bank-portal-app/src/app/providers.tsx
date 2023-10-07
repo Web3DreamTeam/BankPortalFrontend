@@ -1,5 +1,6 @@
 'use client'; 
 import { ChakraProvider } from "@chakra-ui/react";
+import DIDProvider from "./context";
 
 export function Providers ({
     children
@@ -8,7 +9,9 @@ export function Providers ({
 }) {
     return (
         <ChakraProvider>
-            {children}
+            <DIDProvider>
+                {children}
+            </DIDProvider>
         </ChakraProvider>
     )
 }

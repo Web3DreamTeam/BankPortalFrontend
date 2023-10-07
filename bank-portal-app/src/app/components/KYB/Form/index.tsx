@@ -87,7 +87,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Input variant={businessLicenseCredentialData ? 'filled' : 'outline'} defaultValue={businessLicenseCredentialData ? businessLicenseCredentialData.city : ''} type="text" placeholder="City"/>
                                 <FormLabel>Zip Code</FormLabel>
                                 <Input variant={businessLicenseCredentialData ? 'filled' : 'outline'} defaultValue={businessLicenseCredentialData ? businessLicenseCredentialData.zipCode : ''} type="text" placeholder="Zip Code"/>
-                                <Button variant={businessLicenseCredentialData ? 'outline' : 'solid'} isDisabled={!!businessLicenseCredentialData} onClick={() => handleAutofill("BusinessLicenseCredential")} mb={4} colorScheme={'green'} >{businessLicenseCredentialData ? 'Business License Verified': 'Autofill with Business License VC'}</Button>
+                                <Button variant={businessLicenseCredentialData ? 'outline' : 'solid'} isDisabled={!!businessLicenseCredentialData} onClick={() => handleAutofill("BusinessLicenseCredential")} mb={4} backgroundColor={'whitesmoke'} color={'#261803'} >{businessLicenseCredentialData ? 'Business License Verified': 'Autofill with Business License VC'}</Button>
                             </Stack>
                         </FormControl>
                         <FormControl>
@@ -100,12 +100,12 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Input variant={incomeStatementCredentialData ? 'filled' : 'outline'} defaultValue={incomeStatementCredentialData ? parseDollarAmount(incomeStatementCredentialData.operatingExpenses) : ''} type="text" placeholder="$"/>
                                 <FormLabel>Tax Rate</FormLabel>
                                 <Input variant={incomeStatementCredentialData ? 'filled' : 'outline'} defaultValue={incomeStatementCredentialData ? incomeStatementCredentialData.taxRate+'%' : ''} type="text" placeholder="%"/>
-                                <Button variant={incomeStatementCredentialData ? 'outline' : 'solid'} isDisabled={!!incomeStatementCredentialData} onClick={() => handleAutofill("IncomeStatementCredential")} mb={4} colorScheme={'green'} >{businessLicenseCredentialData ? 'Business License Verified': 'Autofill with Income Statement VC'}</Button>
+                                <Button variant={incomeStatementCredentialData ? 'outline' : 'solid'} isDisabled={!!incomeStatementCredentialData} onClick={() => handleAutofill("IncomeStatementCredential")} mb={4} backgroundColor={'whitesmoke'} color={'#261803'} >{businessLicenseCredentialData ? 'Business License Verified': 'Autofill with Income Statement VC'}</Button>
                             </Stack>
                         </FormControl>
                         <FormControl mt={5} isRequired>
                             <Stack spacing={2}>
-                                <Button isDisabled={progress < 99} onClick={handleSubmitApplication} mb={4} color="blue.400" backgroundColor={"white"} variant={'outline'}>Submit Application</Button>
+                                <Button isDisabled={progress < 99} onClick={handleSubmitApplication} mb={4} color={'#261803'} backgroundColor={"white"} variant={'outline'}>Submit Application</Button>
                             </Stack>
                         </FormControl>
                     </div> : 
