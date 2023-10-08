@@ -1,49 +1,47 @@
 import { requestPresentation, verifyCredentials } from "@/app/utils/agentService";
-import { Button, Divider, Flex, FormControl, FormLabel, Icon, Input, Modal, ModalBody, ModalContent, ModalHeader, ModalOverlay, Progress, Stack, Text } from "@chakra-ui/react";
+import { Button, Divider, Flex, FormControl, FormLabel, Icon, Input, Modal, ModalBody, ModalContent, ModalHeader, ModalOverlay, Progress, Stack, Text, useInterval } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import {BiSolidCheckCircle} from 'react-icons/bi'
+import { useDIDContext } from "@/app/context";
 
 interface VerificationModalProps {
     isOpen: boolean;
     onClose: () => void; 
-    getCredentialType:() => string; 
-    setVCData: (data:any) => void;
+    getCredentialType:() => string[]; 
+    setFormData: (data:any) => void;
 }
 
-const VerificationModal = ({isOpen, onClose, getCredentialType, setVCData}:VerificationModalProps) => {
+const VerificationModal = ({isOpen, onClose, getCredentialType, setFormData}:VerificationModalProps) => {
     // verification process states
-    const [targetUsername, setTargetUsername] = useState('');
+    const {did} = useDIDContext(); 
     const [qrData, setQRData] = useState<any>(undefined); 
-    const [verified, setVerified] = useState(false); 
-    // UI states
-    const [errorMessage, setErrorMessage] = useState(''); 
-    const [isLoading, setIsLoading] = useState(false)
+    const [verified, setVerified] = useState(false);
 
     const handlePresentationRequest = async () => {
-        setIsLoading(true);
-        const data = await requestPresentation(targetUsername, getCredentialType());
+        const data = await requestPresentation(did, getCredentialType());
         console.log(data);
-        setIsLoading(false);
         setQRData(data); 
     }
 
     const handleVerifyPresentation = async () => {
-        setErrorMessage(''); 
         if(qrData) {
-            setIsLoading(true);
-            const data = await verifyCredentials(qrData.data.id); 
-            console.log(data.verifiablePresentation.verifiableCredential[0].credentialSubject); 
-            setIsLoading(false)
-            // if verification successful
-                // set verified to true
-            setVerified(data.verified); 
-            // bubble up the VC data to fill the form
-            setVCData(data.verifiablePresentation.verifiableCredential[0].credentialSubject);
-            // else
-                // setErrorMessage 
-        } 
-    }
+                const data = await verifyCredentials(qrData.data.id); 
+                if(data && data.verified) {
+                    setVerified(data.verified); 
+                    // bubble up the VC data to fill the form
+                    setFormData(data.verifiablePresentation.verifiableCredential);
+
+                }
+            }
+        }
+    
+    useInterval(() => {
+        if(!qrData && isOpen)
+            handlePresentationRequest();
+        if((qrData && !verified))
+            handleVerifyPresentation();
+    },!verified ? 2000 : null)     
 
     useEffect(() => {
     },[qrData,verified]); 
@@ -63,18 +61,10 @@ const VerificationModal = ({isOpen, onClose, getCredentialType, setVCData}:Verif
                     <FormControl isRequired>
                         <Stack spacing={2}>
                         <Text fontWeight={'bold'} textAlign={'center'}>Follow the Instructions</Text>
-                            {(!qrData && !verified) &&
-                            <Flex justifyContent={'center'} flexDirection={'column'}>
-                                <FormLabel>Username</FormLabel>
-                                <Input type="text" placeholder="username" onChange={(e) => setTargetUsername(e.target.value)}></Input>
-                                <Button m={4} isLoading={isLoading} onClick={handlePresentationRequest} mb={4} color="white" backgroundColor={"green.400"} variant={'solid'}>Request Verifiable Presentation QR</Button>
-                            </Flex>}
                             {(qrData && !verified) &&
                             <Flex alignItems={'center'} flexDirection={'column'}>
                                 <FormLabel>Scan QR</FormLabel>
                                 <QRCode size={200} value={JSON.stringify(qrData)}/>
-                                <Button m={4} isLoading={isLoading} onClick={handleVerifyPresentation} borderColor={errorMessage && 'red.400'} mb={4} color="white" backgroundColor={"green.400"} variant={'solid'}>Verify My credentials</Button>
-                                {errorMessage && <Text color={'red.400'}>Please Retry</Text>}
                             </Flex>
                             }
                             {verified && 

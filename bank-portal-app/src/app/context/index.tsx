@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-
+import { login } from "../utils/agentService";
 interface DIDContextValue {
     did:string; 
     setDID: (did:string) => void; 
@@ -18,7 +18,9 @@ const DIDProvider:React.FC<DIDProviderProps> = ({
 }) => {
     const [did, setDID] = useState<string>(''); 
 
-    useEffect(() =>{},[]); 
+    useEffect(() => {
+        login('JPM','123'); 
+    },[did]); 
 
     return (
         <DIDContext.Provider

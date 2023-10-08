@@ -14,7 +14,6 @@ const Navbar = () => {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); 
 
     useEffect(() => {
-        console.log(did);
     },[did])
 
     return (

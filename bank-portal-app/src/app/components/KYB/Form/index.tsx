@@ -3,9 +3,16 @@ import { useEffect, useState } from "react";
 import VerificationModal from "../../common/VerificationModal";
 import { parseDollarAmount } from "@/app/utils/helpers";
 import {LuPartyPopper} from 'react-icons/lu'; 
+import { BusinessLicenseCredential, IncomeStatementCredential, KYBCredentials } from "@/app/utils/constants";
+
 interface ModalProps {
     isOpen: boolean,
     onClose: () => void; 
+}
+
+interface KYB {
+    businessLicenseVC:any|undefined; 
+    incomeStatementVC:any|undefined; 
 }
 
 const KYBForm = ({isOpen, onClose}:ModalProps) => {
@@ -17,46 +24,58 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
 
     //credentials state
     const [credentialType, setCredentialType] = useState('');
-    const [businessLicenseCredentialData, setBusinessLicenseCredentialData] = useState<any>(undefined); 
-    const [incomeStatementCredentialData, setIncomeStatementCredentialData] = useState<any>(undefined);
+    const [kybData, setKybData] = useState<KYB>({businessLicenseVC: undefined, incomeStatementVC: undefined})
 
      const handleAutofill = (cType:string) => {
-         // show the verification modal
          setCredentialType(cType);
          setIsVerificationModalOpen(true);  
      }
  
-    const handleSubmitApplication = () => {
-        setIsSubmitted(true); 
-     }
+
     const updateProgressBar = () => {
         const base = 50;
         let multiplier = 0; 
-        if(businessLicenseCredentialData)
+        if(kybData.businessLicenseVC)
             multiplier+=1
-        if(incomeStatementCredentialData)
+        if(kybData.incomeStatementVC)
             multiplier+=1
         setProgress(base*multiplier); 
     }
 
-    const selectCredentialDataState = (credentialType:string) => {
-        if(credentialType === 'BusinessLicenceCredential')
-            return setBusinessLicenseCredentialData; 
-        if(credentialType === 'IncomeStatementCredential')
-            return setIncomeStatementCredentialData;
+    const getCredentialType = () => {
+        if(credentialType === 'KYB')
+            // pass an array containing all the credentials required for the KYC verification
+            return KYBCredentials; 
+        else { // return the specific credential
+            return [credentialType]
+        }
     }
+
+    const setKYBFormData = (data:any) => {
+        if(data.length > 1) {
+            setKybData({businessLicenseVC:data[0].credentialSubject, incomeStatementVC: data[1].credentialSubject})
+        } else {
+            if(credentialType === BusinessLicenseCredential) {
+                setKybData({businessLicenseVC: data[0].credentialSubject, incomeStatementVC: kybData.incomeStatementVC})
+            }
+            if(credentialType === IncomeStatementCredential) {
+                setKybData({businessLicenseVC: kybData.businessLicenseVC, incomeStatementVC: data[0].credentialSubject})
+            }
+        }
+    }
+
     useEffect(() => {
         updateProgressBar(); 
-        console.log(businessLicenseCredentialData); 
-    },[businessLicenseCredentialData, incomeStatementCredentialData,isOpen])
+        console.log(kybData); 
+    },[kybData,isOpen])
     
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
                <VerificationModal 
                             isOpen={isVerificationModalOpen} 
                             onClose={() => setIsVerificationModalOpen(false)} 
-                            setVCData={selectCredentialDataState(credentialType)!} 
-                            getCredentialType={() => credentialType}
+                            setFormData={setKYBFormData} 
+                            getCredentialType={getCredentialType}
                             />
             <ModalOverlay/>
             <ModalContent>
@@ -67,6 +86,19 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                     </Flex>
                     <Divider border='2px solid #FOBD3F'></Divider>
                     <Progress value={progress} size='xs' colorScheme='green' />
+                    {!isSubmitted && <Flex alignItems={'center'}>
+                        <Button 
+                            width={'100%'}
+                            variant={kybData.businessLicenseVC && kybData.incomeStatementVC ? 'outline' : 'solid'} 
+                            isDisabled={kybData.businessLicenseVC && kybData.incomeStatementVC} 
+                            onClick={() => handleAutofill('KYB')} 
+                            m={4} 
+                            backgroundColor={'whitesmoke'} 
+                            color={'#261803'}
+                        >
+                            Autofill KYC Form
+                        </Button>
+                    </Flex>}
                 </ModalHeader>
                 <ModalBody justifyContent={'center'}>
                 {!isSubmitted ? 
@@ -76,18 +108,56 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                             <Stack spacing={2}>
                                 <Text textAlign={'center'}>Business Information</Text>
                                 <FormLabel>Business Legal Name</FormLabel>
-                                <Input variant={businessLicenseCredentialData ? 'filled' : 'outline'} defaultValue={businessLicenseCredentialData ? businessLicenseCredentialData.legalName : ''} type="text" placeholder="Business Legal Name"/>
+                                <Input 
+                                    variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
+                                    defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.legalName : ''} 
+                                    type="text" 
+                                    placeholder="Business Legal Name"
+                                />
                                 <FormLabel>License Number</FormLabel>
-                                <Input variant={businessLicenseCredentialData ? 'filled' : 'outline'} defaultValue={businessLicenseCredentialData ? businessLicenseCredentialData.licenseNumber : ''} type="text" placeholder="License Number"/>
+                                <Input 
+                                    variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
+                                    defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.licenseNumber : ''} 
+                                    type="text" 
+                                    placeholder="License Number"
+                                />
                                 <FormLabel>Tax Identification Number</FormLabel>
-                                <Input variant={businessLicenseCredentialData ? 'filled' : 'outline'} defaultValue={businessLicenseCredentialData ? businessLicenseCredentialData.taxIdentificationNumber : ''} type="text" placeholder="Tax Identification Number"/>
+                                <Input 
+                                    variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
+                                    defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.taxIdentificationNumber : ''} 
+                                    type="text" 
+                                    placeholder="Tax Identification Number"
+                                />
                                 <FormLabel>Mailing Address</FormLabel>
-                                <Input variant={businessLicenseCredentialData ? 'filled' : 'outline'} defaultValue={businessLicenseCredentialData ? businessLicenseCredentialData.mailingAddress : ''} type="email" placeholder="Mailing Address"/>
+                                <Input 
+                                    variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
+                                    defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.mailingAddress : ''} 
+                                    type="email" 
+                                    placeholder="Mailing Address"
+                                />
                                 <FormLabel>City</FormLabel>
-                                <Input variant={businessLicenseCredentialData ? 'filled' : 'outline'} defaultValue={businessLicenseCredentialData ? businessLicenseCredentialData.city : ''} type="text" placeholder="City"/>
+                                <Input 
+                                    variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
+                                    defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.city : ''} 
+                                    type="text" 
+                                    placeholder="City"
+                                />
                                 <FormLabel>Zip Code</FormLabel>
-                                <Input variant={businessLicenseCredentialData ? 'filled' : 'outline'} defaultValue={businessLicenseCredentialData ? businessLicenseCredentialData.zipCode : ''} type="text" placeholder="Zip Code"/>
-                                <Button variant={businessLicenseCredentialData ? 'outline' : 'solid'} isDisabled={!!businessLicenseCredentialData} onClick={() => handleAutofill("BusinessLicenseCredential")} mb={4} backgroundColor={'whitesmoke'} color={'#261803'} >{businessLicenseCredentialData ? 'Business License Verified': 'Autofill with Business License VC'}</Button>
+                                <Input 
+                                    variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
+                                    defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.zipCode : ''} 
+                                    type="text" 
+                                    placeholder="Zip Code"
+                                />
+                                <Button 
+                                    variant={kybData.businessLicenseVC ? 'outline' : 'solid'} 
+                                    isDisabled={!!kybData.businessLicenseVC} 
+                                    onClick={() => handleAutofill("BusinessLicenseCredential")} 
+                                    mb={4} backgroundColor={'whitesmoke'} 
+                                    color={'#261803'}
+                                    >
+                                        {kybData.businessLicenseVC ? 'Business License Verified': 'Autofill with Business License VC'}
+                                </Button>
                             </Stack>
                         </FormControl>
                         <FormControl>
@@ -95,17 +165,50 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Divider border='2px solid #FOBD3F'></Divider> 
                                 <Text textAlign={'center'}>Financial Information</Text>
                                 <FormLabel>Gross Profit</FormLabel>
-                                <Input variant={incomeStatementCredentialData ? 'filled' : 'outline'} defaultValue={incomeStatementCredentialData ? parseDollarAmount(incomeStatementCredentialData.grossProfit) : ''} type="text" placeholder="$"/>
+                                <Input 
+                                    variant={kybData.incomeStatementVC ? 'filled' : 'outline'} 
+                                    defaultValue={kybData.incomeStatementVC ? parseDollarAmount(kybData.incomeStatementVC.grossProfit) : ''} 
+                                    type="text" 
+                                    placeholder="$"
+                                />
                                 <FormLabel>Operating Expenses</FormLabel>
-                                <Input variant={incomeStatementCredentialData ? 'filled' : 'outline'} defaultValue={incomeStatementCredentialData ? parseDollarAmount(incomeStatementCredentialData.operatingExpenses) : ''} type="text" placeholder="$"/>
+                                <Input 
+                                    variant={kybData.incomeStatementVC ? 'filled' : 'outline'} 
+                                    defaultValue={kybData.incomeStatementVC ? parseDollarAmount(kybData.incomeStatementVC.operatingExpenses) : ''} 
+                                    type="text" 
+                                    placeholder="$"
+                                />
                                 <FormLabel>Tax Rate</FormLabel>
-                                <Input variant={incomeStatementCredentialData ? 'filled' : 'outline'} defaultValue={incomeStatementCredentialData ? incomeStatementCredentialData.taxRate+'%' : ''} type="text" placeholder="%"/>
-                                <Button variant={incomeStatementCredentialData ? 'outline' : 'solid'} isDisabled={!!incomeStatementCredentialData} onClick={() => handleAutofill("IncomeStatementCredential")} mb={4} backgroundColor={'whitesmoke'} color={'#261803'} >{businessLicenseCredentialData ? 'Business License Verified': 'Autofill with Income Statement VC'}</Button>
+                                <Input 
+                                    variant={kybData.incomeStatementVC ? 'filled' : 'outline'} 
+                                    defaultValue={kybData.incomeStatementVC ? kybData.incomeStatementVC.taxRate+'%' : ''} 
+                                    type="text" 
+                                    placeholder="%"
+                                />
+                                <Button 
+                                    variant={kybData.incomeStatementVC ? 'outline' : 'solid'} 
+                                    isDisabled={!!kybData.incomeStatementVC} 
+                                    onClick={() => handleAutofill("IncomeStatementCredential")} 
+                                    mb={4} 
+                                    backgroundColor={'whitesmoke'} 
+                                    color={'#261803'}
+                                >
+                                    {kybData.businessLicenseVC ? 'Business License Verified': 'Autofill with Income Statement VC'}
+                                </Button>
                             </Stack>
                         </FormControl>
                         <FormControl mt={5} isRequired>
                             <Stack spacing={2}>
-                                <Button isDisabled={progress < 99} onClick={handleSubmitApplication} mb={4} color={'#261803'} backgroundColor={"white"} variant={'outline'}>Submit Application</Button>
+                                <Button 
+                                    isDisabled={progress < 99} 
+                                    onClick={() => setIsSubmitted(true)} 
+                                    mb={4} 
+                                    color={'#261803'} 
+                                    backgroundColor={"white"} 
+                                    variant={'outline'}
+                                >
+                                    Submit Application
+                                </Button>
                             </Stack>
                         </FormControl>
                     </div> : 

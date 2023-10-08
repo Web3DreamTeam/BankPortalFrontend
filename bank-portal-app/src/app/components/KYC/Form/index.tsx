@@ -3,11 +3,18 @@ import { useEffect, useState } from "react";
 import VerificationModal from "../../common/VerificationModal";
 import { parseDateOfBirth,parseDollarAmount } from "@/app/utils/helpers";
 import {LuPartyPopper} from 'react-icons/lu'
+import { EmploymentCredential, KYCCredentials, PassportCredential, UtilityBillCredential } from "@/app/utils/constants";
 
 interface ModalProps {
     isOpen: boolean,
     onClose: () => void; 
 
+}
+
+interface KYC {
+    identityVC:any|undefined;
+    addressVC:any|undefined; 
+    employmentVC:any|undefined;
 }
 
 const KYCForm = ({isOpen, onClose}:ModalProps) => {
@@ -19,53 +26,63 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
 
     // credentials state
     const [credentialType, setCredentialType] = useState('');
-    const [identityCredentialsData, setIdentityCredentialsData] = useState<any>(undefined); 
-    const [addressCredentialsData, setAddressCredentialsData] = useState<any>(undefined); 
-    const [employmentCredentialsData, setEmploymentCredentialsData] = useState<any>(undefined); 
+    const [kycData,setKycData] = useState<KYC>({identityVC:undefined, addressVC:undefined, employmentVC:undefined}); 
 
 
     const handleAutofill = (cType:string) => {
-        // show the verification modal
         setCredentialType(cType);
         setIsVerificationModalOpen(true);  
     }
 
-    const handleSubmitApplication = () => {
-        setIsSubmitted(true); 
+    const setKYCFormData = (data:any) => {
+        if(data.length > 1) {
+            setKycData({identityVC:data[0].credentialSubject, addressVC: data[1].credentialSubject,employmentVC:data[2].credentialSubject})
+        } else {
+            if(credentialType === PassportCredential) {
+                setKycData({identityVC: data[0].credentialSubject, addressVC:kycData.addressVC, employmentVC:kycData.employmentVC})
+            }
+            if(credentialType === UtilityBillCredential) {
+                setKycData({identityVC: kycData.identityVC, addressVC:data[0].credentialSubject, employmentVC:kycData.employmentVC})
+            }
+            if(credentialType === EmploymentCredential) {
+                setKycData({identityVC: kycData.identityVC, addressVC:kycData.addressVC, employmentVC:data[0].credentialSubject})
+            }
+        }
     }
 
     const updateProgressBar = () => {
         const base = 33;
         let multiplier = 0; 
-        if(identityCredentialsData)
+        if(kycData.identityVC)
             multiplier+=1
-        if(addressCredentialsData)
+        if(kycData.addressVC)
             multiplier+=1
-        if(employmentCredentialsData)
+        if(kycData.employmentVC)
             multiplier+=1
         setProgress(base*multiplier); 
     }
 
-    const selectCredentialDataState = (credentialType:string) => {
-        if(credentialType === 'PassportCredential')
-            return setIdentityCredentialsData; 
-        if(credentialType === 'UtilityBillCredential')
-            return setAddressCredentialsData;
-        if(credentialType === 'EmploymentCredential')
-            return setEmploymentCredentialsData;
+    const getCredentialType = () => {
+        if(credentialType === 'KYC')
+            // pass an array containing all the credentials required for the KYC verification
+            return KYCCredentials; 
+        else { // return the specific credential
+            return [credentialType]
+        }
     }
 
     useEffect(() => {
         updateProgressBar(); 
-        console.log(identityCredentialsData); 
-    },[identityCredentialsData, addressCredentialsData, employmentCredentialsData, isOpen])
+        console.log(kycData); 
+    },[kycData, isOpen]);
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <VerificationModal 
                             isOpen={isVerificationModalOpen} 
                             onClose={() => setIsVerificationModalOpen(false)} 
-                            setVCData={selectCredentialDataState(credentialType)!} 
-                            getCredentialType={() => credentialType}
+                            setFormData={setKYCFormData} 
+                            getCredentialType={getCredentialType}
                             />
             <ModalOverlay/>
             <ModalContent>
@@ -76,6 +93,19 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                     </Flex>
                     <Divider border='2px solid #FOBD3F'></Divider>
                     <Progress value={progress} size='xs' colorScheme='green' />
+                    {!isSubmitted && <Flex alignItems={'center'}>
+                        <Button 
+                            width={'100%'}
+                            variant={kycData.identityVC ? 'outline' : 'solid'} 
+                            isDisabled={!!kycData.identityVC && !!kycData.addressVC && !!kycData.employmentVC} 
+                            onClick={() => handleAutofill('KYC')} 
+                            m={4} 
+                            backgroundColor={'whitesmoke'} 
+                            color={'#261803'}
+                        >
+                            Autofill KYC Form
+                        </Button>
+                    </Flex>}
                 </ModalHeader>
                 <ModalBody justifyContent={'center'}>
                 {!isSubmitted ? 
@@ -85,12 +115,34 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                         <Stack spacing={2}>
                             <Text textAlign={'center'}>Identity Information</Text>
                             <FormLabel>First Name</FormLabel>
-                            <Input variant={identityCredentialsData ? 'filled' : 'outline'} defaultValue={identityCredentialsData ? identityCredentialsData.firstName : ''} type="text" placeholder="Bob"/>
+                            <Input 
+                                variant={kycData.identityVC ? 'filled' : 'outline'} 
+                                defaultValue={kycData.identityVC ? kycData.identityVC.firstName : ''} 
+                                type="text" 
+                                placeholder="Bob"
+                            />
                             <FormLabel >Last Name</FormLabel>
-                            <Input variant={identityCredentialsData ? 'filled' : 'outline'} defaultValue={identityCredentialsData ? identityCredentialsData.lastName : ''} type="text" placeholder="Fischer"/>
+                            <Input 
+                                variant={kycData.identityVC ? 'filled' : 'outline'} 
+                                defaultValue={kycData.identityVC ? kycData.identityVC.lastName : ''} 
+                                type="text" 
+                                placeholder="Fischer"
+                            />
                             <FormLabel>Date of Birth</FormLabel>
-                            <Input variant={identityCredentialsData ? 'filled' : 'outline'} defaultValue={identityCredentialsData ? parseDateOfBirth(identityCredentialsData.dateOfBirth) : ''} type="text"/>
-                            <Button variant={identityCredentialsData ? 'outline' : 'solid'} isDisabled={!!identityCredentialsData} onClick={() => handleAutofill("PassportCredential")} mb={4} backgroundColor={'whitesmoke'} color={'#261803'} >{identityCredentialsData ? 'Identity Verified': 'Autofill with Identity VC'}</Button>
+                            <Input 
+                                variant={kycData.identityVC ? 'filled' : 'outline'} 
+                                defaultValue={kycData.identityVC ? parseDateOfBirth(kycData.identityVC.dateOfBirth) : ''} 
+                                type="text"
+                            />
+                            <Button 
+                                variant={kycData.identityVC ? 'outline' : 'solid'} 
+                                isDisabled={!!kycData.identityVC} 
+                                onClick={() => handleAutofill(PassportCredential)} 
+                                mb={4} backgroundColor={'whitesmoke'} 
+                                color={'#261803'}
+                            >
+                                {kycData.identityVC ? 'Identity Verified': 'Autofill with Identity VC'}
+                            </Button>
                         </Stack>
                     </FormControl>
                         <Divider border='2px solid #FOBD3F'></Divider>
@@ -99,16 +151,50 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                             <Divider border='2px solid #FOBD3F'></Divider>
                             <Text textAlign={'center'}>Address Information</Text>
                             <FormLabel>Country</FormLabel>
-                            <Input variant={addressCredentialsData ? 'filled' : 'outline'} defaultValue={addressCredentialsData ? addressCredentialsData.country : ''} type="text" placeholder="United States"/>
+                            <Input 
+                                variant={kycData.addressVC ? 'filled' : 'outline'} 
+                                defaultValue={kycData.addressVC ? kycData.addressVC.country : ''} 
+                                type="text" 
+                                placeholder="United States"
+                            />
                             <FormLabel>State</FormLabel>
-                            <Input variant={addressCredentialsData ? 'filled' : 'outline'} defaultValue={addressCredentialsData ? addressCredentialsData.state : ''} type="text" placeholder="New York"/>
+                            <Input 
+                                variant={kycData.addressVC ? 'filled' : 'outline'} 
+                                defaultValue={kycData.addressVC ? kycData.addressVC.state : ''} 
+                                type="text" 
+                                placeholder="New York"
+                            />
                             <FormLabel>City</FormLabel>
-                            <Input variant={addressCredentialsData ? 'filled' : 'outline'} defaultValue={addressCredentialsData ? addressCredentialsData.city : ''} type="text" placeholder="New York"/>
+                            <Input 
+                                variant={kycData.addressVC ? 'filled' : 'outline'} 
+                                defaultValue={kycData.addressVC ? kycData.addressVC.city : ''} 
+                                type="text" 
+                                placeholder="New York"
+                            />
                             <FormLabel>Address Line</FormLabel>
-                            <Input variant={addressCredentialsData ? 'filled' : 'outline'} defaultValue={addressCredentialsData ? addressCredentialsData.address : ''} type="text" placeholder="7th Avenue"/>
+                            <Input 
+                                variant={kycData.addressVC ? 'filled' : 'outline'} 
+                                defaultValue={kycData.addressVC ? kycData.addressVC.address : ''} 
+                                type="text" 
+                                placeholder="7th Avenue"
+                            />
                             <FormLabel>Zip Code</FormLabel>
-                            <Input variant={addressCredentialsData ? 'filled' : 'outline'} defaultValue={addressCredentialsData ? addressCredentialsData.zipCode : ''} type="text" placeholder="M5H 2X4"/>
-                            <Button variant={addressCredentialsData ? 'outline' : 'solid'} isDisabled={!!addressCredentialsData} onClick={() => handleAutofill("UtilityBillCredential")} mb={4}  backgroundColor={'whitesmoke'} color={'#261803'}> Autofill with Address VCs</Button>
+                            <Input 
+                                variant={kycData.addressVC ? 'filled' : 'outline'} 
+                                defaultValue={kycData.addressVC ? kycData.addressVC.zipCode : ''} 
+                                type="text" 
+                                placeholder="M5H 2X4"
+                            />
+                            <Button 
+                                variant={kycData.addressVC ? 'outline' : 'solid'} 
+                                isDisabled={!!kycData.addressVC} 
+                                onClick={() => handleAutofill(UtilityBillCredential)} 
+                                mb={4}  
+                                backgroundColor={'whitesmoke'} 
+                                color={'#261803'}
+                            > 
+                                Autofill with Address VCs
+                            </Button>
                             </Stack>
                         </FormControl>
                         <FormControl isRequired>
@@ -116,17 +202,48 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                                 <Divider border='2px solid #FOBD3F'></Divider>
                                 <Text textAlign={'center'}>Employment Information</Text>
                                 <FormLabel>Employer Name</FormLabel>
-                                <Input variant={employmentCredentialsData ? 'filled' : 'outline'} defaultValue={employmentCredentialsData ? employmentCredentialsData.employerName : ''} type="text" placeholder="Abbott Inc."/>
+                                <Input 
+                                    variant={kycData.employmentVC ? 'filled' : 'outline'} 
+                                    defaultValue={kycData.employmentVC ? kycData.employmentVC.employerName : ''} 
+                                    type="text" 
+                                    placeholder="Abbott Inc."
+                                />
                                 <FormLabel>Job Title</FormLabel>
-                                <Input variant={employmentCredentialsData ? 'filled' : 'outline'} defaultValue={employmentCredentialsData ? employmentCredentialsData.jobTitle : ''} type="text" placeholder="Data Analyst"/>
+                                <Input 
+                                    variant={kycData.employmentVC ? 'filled' : 'outline'} 
+                                    defaultValue={kycData.employmentVC ? kycData.employmentVC.jobTitle : ''} 
+                                    type="text" 
+                                    placeholder="Data Analyst"
+                                />
                                 <FormLabel>Salary</FormLabel>
-                                <Input variant={employmentCredentialsData ? 'filled' : 'outline'} defaultValue={employmentCredentialsData ? parseDollarAmount(employmentCredentialsData.salary) : ''} type="text" placeholder="$"/>
-                                <Button variant={employmentCredentialsData ? 'outline' : 'solid'} isDisabled={!!employmentCredentialsData} onClick={() => handleAutofill("EmploymentCredential")} backgroundColor={'whitesmoke'} color={'#261803'}>Autofill with Employment VCs</Button>
+                                <Input 
+                                    variant={kycData.employmentVC ? 'filled' : 'outline'} 
+                                    defaultValue={kycData.employmentVC ? parseDollarAmount(kycData.employmentVC.salary) : ''} 
+                                    type="text" 
+                                    placeholder="$"/>
+                                <Button 
+                                    variant={kycData.employmentVC ? 'outline' : 'solid'} 
+                                    isDisabled={!!kycData.employmentVC} 
+                                    onClick={() => handleAutofill(EmploymentCredential)} 
+                                    backgroundColor={'whitesmoke'} 
+                                    color={'#261803'}
+                                >
+                                    Autofill with Employment VCs
+                                </Button>
                             </Stack>
                         </FormControl>
                         <FormControl mt={5} isRequired>
                             <Stack spacing={2}>
-                                <Button isDisabled={progress < 99} onClick={handleSubmitApplication} mb={4} color={'#261803'} backgroundColor={"white"} variant={'outline'}>Submit Application</Button>
+                                <Button 
+                                    isDisabled={progress < 99} 
+                                    onClick={() => setIsSubmitted(true)} 
+                                    mb={4} 
+                                    color={'#261803'} 
+                                    backgroundColor={"white"} 
+                                    variant={'outline'}
+                                    >
+                                        Submit Application
+                                    </Button>
                             </Stack>
                         </FormControl>
                     </div> : 
