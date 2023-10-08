@@ -35,7 +35,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
     const updateProgressBar = () => {
         const base = 50;
         let multiplier = 0; 
-        if(kybData.businessLicenseVC)
+        if(kybData.businessLicenseVC.licenseNumber)
             multiplier+=1
         if(kybData.incomeStatementVC)
             multiplier+=1
@@ -52,7 +52,10 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
     }
 
     const setKYBFormData = (data:any) => {
-        if(data.length > 1) {
+        if(data.disclosed && data.disclosed.length > 0) { //sd-jwt
+            setKybData({businessLicenseVC:data.disclosed[0], incomeStatementVC:kybData.incomeStatementVC})
+        }
+        else if (data.length > 1) {
             setKybData({businessLicenseVC:data[0].credentialSubject, incomeStatementVC: data[1].credentialSubject})
         } else {
             if(credentialType === BusinessLicenseCredential) {
@@ -96,7 +99,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                             backgroundColor={'whitesmoke'} 
                             color={'#261803'}
                         >
-                            Autofill KYC Form
+                            Autofill KYB Form
                         </Button>
                     </Flex>}
                 </ModalHeader>
@@ -111,6 +114,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Input 
                                     variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
                                     defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.legalName : ''} 
+                                    borderColor={!kybData.businessLicenseVC ? 'whitesmoke' : (kybData.businessLicenseVC.legalName ? 'whitesmoke' : 'red.400')}
                                     type="text" 
                                     placeholder="Business Legal Name"
                                 />
@@ -118,6 +122,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Input 
                                     variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
                                     defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.licenseNumber : ''} 
+                                    borderColor={!kybData.businessLicenseVC ? 'whitesmoke' : (kybData.businessLicenseVC.licenseNumber ? 'whitesmoke' : 'red.400')}
                                     type="text" 
                                     placeholder="License Number"
                                 />
@@ -125,13 +130,15 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Input 
                                     variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
                                     defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.taxIdentificationNumber : ''} 
+                                    borderColor={!kybData.businessLicenseVC ? 'whitesmoke' : (kybData.businessLicenseVC.taxIdentificationNumber ? 'whitesmoke' : 'red.400')}
                                     type="text" 
                                     placeholder="Tax Identification Number"
                                 />
                                 <FormLabel>Mailing Address</FormLabel>
                                 <Input 
                                     variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
-                                    defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.mailingAddress : ''} 
+                                    defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.mailingAddress : ''}
+                                    borderColor={!kybData.businessLicenseVC ? 'whitesmoke' : (kybData.businessLicenseVC.mailingAddress ? 'whitesmoke' : 'red.400')} 
                                     type="email" 
                                     placeholder="Mailing Address"
                                 />
@@ -139,6 +146,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Input 
                                     variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
                                     defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.city : ''} 
+                                    borderColor={!kybData.businessLicenseVC ? 'whitesmoke' : (kybData.businessLicenseVC.city ? 'whitesmoke' : 'red.400')}
                                     type="text" 
                                     placeholder="City"
                                 />
@@ -146,17 +154,18 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Input 
                                     variant={kybData.businessLicenseVC ? 'filled' : 'outline'} 
                                     defaultValue={kybData.businessLicenseVC ? kybData.businessLicenseVC.zipCode : ''} 
+                                    borderColor={!kybData.businessLicenseVC ? 'whitesmoke' : (kybData.businessLicenseVC.zipCode ? 'whitesmoke' : 'red.400')}
                                     type="text" 
                                     placeholder="Zip Code"
                                 />
                                 <Button 
                                     variant={kybData.businessLicenseVC ? 'outline' : 'solid'} 
-                                    isDisabled={!!kybData.businessLicenseVC} 
+                                    isDisabled={kybData.businessLicenseVC.licenseNumber} 
                                     onClick={() => handleAutofill("BusinessLicenseCredential")} 
                                     mb={4} backgroundColor={'whitesmoke'} 
                                     color={'#261803'}
                                     >
-                                        {kybData.businessLicenseVC ? 'Business License Verified': 'Autofill with Business License VC'}
+                                        {kybData.businessLicenseVC.licenseNumber ? 'Business License Verified': 'Autofill with Business License VC'}
                                 </Button>
                             </Stack>
                         </FormControl>

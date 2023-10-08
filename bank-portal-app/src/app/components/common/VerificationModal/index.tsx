@@ -27,11 +27,17 @@ const VerificationModal = ({isOpen, onClose, getCredentialType, setFormData}:Ver
     const handleVerifyPresentation = async () => {
         if(qrData) {
                 const data = await verifyCredentials(qrData.data.id); 
+                console.log(data.vp.verified);
+                if(data && data.vp.verified && data.disclosed && data.disclosed.length > 0) { // sd -jwt
+                    setVerified(data.vp.verified); 
+                    // bubble up the VC data to fill the form
+                    setFormData(data);
+
+                }  
                 if(data && data.verified) {
                     setVerified(data.verified); 
                     // bubble up the VC data to fill the form
                     setFormData(data.verifiablePresentation.verifiableCredential);
-
                 }
             }
         }
