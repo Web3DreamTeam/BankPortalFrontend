@@ -35,7 +35,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
     const updateProgressBar = () => {
         const base = 50;
         let multiplier = 0; 
-        if(kybData.businessLicenseVC.licenseNumber)
+        if(kybData.businessLicenseVC && kybData.businessLicenseVC.licenseNumber)
             multiplier+=1
         if(kybData.incomeStatementVC)
             multiplier+=1
@@ -160,12 +160,12 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 />
                                 <Button 
                                     variant={kybData.businessLicenseVC ? 'outline' : 'solid'} 
-                                    isDisabled={kybData.businessLicenseVC.licenseNumber} 
+                                    isDisabled={kybData.businessLicenseVC && kybData.businessLicenseVC.licenseNumber} 
                                     onClick={() => handleAutofill("BusinessLicenseCredential")} 
                                     mb={4} backgroundColor={'whitesmoke'} 
                                     color={'#261803'}
                                     >
-                                        {kybData.businessLicenseVC.licenseNumber ? 'Business License Verified': 'Autofill with Business License VC'}
+                                        {kybData.businessLicenseVC && kybData.businessLicenseVC.licenseNumber ? 'Business License Verified': 'Autofill with Business License VC'}
                                 </Button>
                             </Stack>
                         </FormControl>
