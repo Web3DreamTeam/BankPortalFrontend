@@ -8,7 +8,6 @@ import { EmploymentCredential, KYCCredentials, PassportCredential, UtilityBillCr
 interface ModalProps {
     isOpen: boolean,
     onClose: () => void; 
-
 }
 
 interface KYC {
@@ -35,6 +34,7 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
     }
 
     const setKYCFormData = (data:any) => {
+        console.log(data); 
         if(data.length > 1) {
             setKycData({identityVC:data[0].credentialSubject, addressVC: data[1].credentialSubject,employmentVC:data[2].credentialSubject})
         } else {
