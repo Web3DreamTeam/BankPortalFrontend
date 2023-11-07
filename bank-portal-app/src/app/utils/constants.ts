@@ -10,3 +10,16 @@ export const UtilityBillCredential = 'UtilityBillCredential';
 
 export const BusinessLicenseCredential = 'BusinessLicenseCredential'; 
 export const IncomeStatementCredential = 'IncomeStatementCredential'; 
+export interface ReusableKYCCredential { 
+    firstName:string; 
+    lastName:string; 
+    dateOfBirth:string; 
+    address:string; 
+    country:string;
+    state:string;
+    city:string
+    zipCode:string;
+    jobTitle:string; 
+    employerName:string; 
+    salary:string;
+}

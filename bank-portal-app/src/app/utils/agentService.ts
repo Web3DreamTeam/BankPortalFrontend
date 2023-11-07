@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios'; 
-import { verifierUsername } from './constants';
+import { ReusableKYCCredential, verifierUsername } from './constants';
 
 const agentAPIUrl = 'http://localhost:8000';
 
@@ -70,6 +70,24 @@ export const getBalance = async (did:string) => {
         return response.data.balance; 
     }
 }
+
+export const  issueReusableKYC = async (targetDID:string, credentialData:ReusableKYCCredential) => {
+    const url = agentAPIUrl+ '/issue'; 
+
+    const did = await getDID(verifierUsername); 
+
+    const response = await axios.post(url,{did:did, targetDID:targetDID, subjectData:credentialData,credentialType:"ReusableKYCCredential",claimValues:undefined,additionalParams:undefined}); 
+    console.log(response.data.data);
+    return response.data.data.credential; 
+}
+
+export const saveCredential = async (vc:any, did:any) => {
+    const url = agentAPIUrl + '/save'
+    const response = await axios.post(url,{did:did, vc:vc}); 
+    console.log(response)
+    return response; 
+}
+
 
 
 

@@ -2,8 +2,11 @@ import { Button, Divider, Flex, FormControl, FormLabel, Icon, Input, Modal, Moda
 import { useEffect, useState } from "react";
 import VerificationModal from "../../common/VerificationModal";
 import { parseDateOfBirth,parseDollarAmount } from "@/app/utils/helpers";
-import {LuPartyPopper} from 'react-icons/lu'
-import { EmploymentCredential, KYCCredentials, PassportCredential, UtilityBillCredential } from "@/app/utils/constants";
+import {CiSaveDown2} from 'react-icons/ci';
+import { EmploymentCredential, KYCCredentials, PassportCredential, ReusableKYCCredential, UtilityBillCredential } from "@/app/utils/constants";
+import { issueReusableKYC, saveCredential } from "@/app/utils/agentService";
+import { useDIDContext } from "@/app/context";
+import { BiSolidCheckCircle } from "react-icons/bi";
 
 interface ModalProps {
     isOpen: boolean,
@@ -22,10 +25,16 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
     const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
     const [progress, setProgress] =  useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false); 
+    const [isLoading, setIsLoading] = useState(false); 
+    const [isSaved, setIsSaved] = useState(false); 
+
 
     // credentials state
     const [credentialType, setCredentialType] = useState('');
     const [kycData,setKycData] = useState<KYC>({identityVC:undefined, addressVC:undefined, employmentVC:undefined}); 
+    const [KYCVC, setKYCVC] = useState<ReusableKYCCredential|undefined>(undefined);
+
+    const {did} = useDIDContext();
 
 
     const handleAutofill = (cType:string) => {
@@ -68,6 +77,35 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
             return KYCCredentials; 
         else { // return the specific credential
             return [credentialType]
+        }
+    }
+
+    const handleSubmitKYC = async () => {
+        setIsLoading(true); 
+
+        const reusableKYC:ReusableKYCCredential = {firstName:kycData.identityVC.firstName, 
+            lastName:kycData.identityVC.lastName,
+            dateOfBirth:kycData.identityVC.dateOfBirth, 
+            country:kycData.addressVC.country, 
+            state:kycData.addressVC.state,
+            city:kycData.addressVC.city, 
+            address:kycData.addressVC.address, 
+            zipCode:kycData.addressVC.zipCode,
+            employerName:kycData.employmentVC.employerName,
+            jobTitle:kycData.employmentVC.jobTitle,
+            salary:kycData.employmentVC.salary}
+
+        const vc = await issueReusableKYC(did,reusableKYC); 
+
+        setKYCVC(vc); 
+        
+        setIsSubmitted(true); 
+    }
+
+    const handleSaveVC = async () => {
+        const response = await saveCredential(KYCVC,did); 
+        if(response.status === 200) {
+            setIsSaved(true);
         }
     }
 
@@ -236,7 +274,8 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                             <Stack spacing={2}>
                                 <Button 
                                     isDisabled={progress < 99} 
-                                    onClick={() => setIsSubmitted(true)} 
+                                    isLoading={isLoading}
+                                    onClick={handleSubmitKYC} 
                                     mb={4} 
                                     color={'#261803'} 
                                     backgroundColor={"white"} 
@@ -251,7 +290,15 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                     <Flex alignItems={'center'} justifyContent={'center'} flexDirection={'column'}>
                         <Text mb={4} textAlign={'center'} fontSize={24} fontWeight={'bold'}>Congratulations Your Application has been approved!</Text>
                         <Text textAlign={'center'} fontSize={16}>You will receive your credit card by mail in the next 7 business days</Text>
-                        <Icon m={10} boxSize={150} color={'blueviolet'} as={LuPartyPopper}></Icon>
+                        <Stack spacing={2}>
+                            <Flex flexDirection={'column'} alignItems={'center'}>
+                                <Text mt={10} fontWeight={'bold'} textAlign={'center'} mb={5} >Save your Reusable KYC Credential for even more streamlined KYC Processes with our Partners</Text>
+                                {!isSaved ? <Icon boxSize={100} color={'green.400'} as={BiSolidCheckCircle}></Icon> :   
+                                <Icon as={CiSaveDown2} boxSize={100} color={'green'}></Icon>
+                                }
+                            </Flex>
+                            <Button m={4} isDisabled={isSaved} onClick={handleSaveVC} mb={4} colorScheme="green" variant={ isSaved ? 'outline' : 'solid'}>{isSaved ? 'Credential Saved' :'Save Credential'}</Button>
+                        </Stack>
                     </Flex>
                     }
                 </ModalBody>
