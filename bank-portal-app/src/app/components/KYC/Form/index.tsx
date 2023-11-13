@@ -30,7 +30,6 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
 
 
     // credentials state
-    const [credentialType, setCredentialType] = useState('');
     const [kycData,setKycData] = useState<KYC>({identityVC:undefined, addressVC:undefined, employmentVC:undefined}); 
     const [KYCVC, setKYCVC] = useState<ReusableKYCCredential|undefined>(undefined);
 
@@ -38,7 +37,6 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
 
 
     const handleAutofill = (cType:string) => {
-        setCredentialType(cType);
         setIsVerificationModalOpen(true);  
     }
 
@@ -47,14 +45,20 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
         if(data.length > 1) {
             setKycData({identityVC:data[0].credentialSubject, addressVC: data[1].credentialSubject,employmentVC:data[2].credentialSubject})
         } else {
-            if(credentialType === PassportCredential) {
+            if(data[0].type.find((el:string) => el === PassportCredential)) {
                 setKycData({identityVC: data[0].credentialSubject, addressVC:kycData.addressVC, employmentVC:kycData.employmentVC})
             }
-            if(credentialType === UtilityBillCredential) {
+            if(data[0].type.find((el:string) => el === UtilityBillCredential)) {
                 setKycData({identityVC: kycData.identityVC, addressVC:data[0].credentialSubject, employmentVC:kycData.employmentVC})
             }
-            if(credentialType === EmploymentCredential) {
+            if(data[0].type.find((el:string) => el === EmploymentCredential)) {
                 setKycData({identityVC: kycData.identityVC, addressVC:kycData.addressVC, employmentVC:data[0].credentialSubject})
+            }
+            if(data[0].type.find((el:string) => el === ReusableKYCCredential)) {
+                const identityVC = {firstName:data[0].credentialSubject.firstName,lastName:data[0].credentialSubject.lastName,dateOfBirth:data[0].credentialSubject.dateOfBirth}
+                const addressVC = {country:data[0].credentialSubject.country,state:data[0].credentialSubject.state,city:data[0].credentialSubject.city,address:data[0].credentialSubject.address, zipCode:data[0].credentialSubject.zipCode}
+                const employmentVC = {employerName:data[0].credentialSubject.employerName,jobTitle:data[0].credentialSubject.jobTitle,salary:data[0].credentialSubject.salary}
+                setKycData({identityVC:identityVC,addressVC:addressVC,employmentVC:employmentVC})
             }
         }
     }
@@ -71,18 +75,10 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
         setProgress(base*multiplier); 
     }
 
-    const getCredentialType = () => {
-        if(credentialType === 'KYC')
-            // pass an array containing all the credentials required for the KYC verification
-            return KYCCredentials; 
-        else { // return the specific credential
-            return [credentialType]
-        }
-    }
-
     const handleSubmitKYC = async () => {
         setIsLoading(true); 
 
+        // build reusable credential to be issued
         const reusableKYC:ReusableKYCCredential = {firstName:kycData.identityVC.firstName, 
             lastName:kycData.identityVC.lastName,
             dateOfBirth:kycData.identityVC.dateOfBirth, 
@@ -95,6 +91,7 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
             jobTitle:kycData.employmentVC.jobTitle,
             salary:kycData.employmentVC.salary}
 
+        // issued the credential
         const vc = await issueReusableKYC(did,reusableKYC); 
 
         setKYCVC(vc); 
@@ -120,7 +117,7 @@ const KYCForm = ({isOpen, onClose}:ModalProps) => {
                             isOpen={isVerificationModalOpen} 
                             onClose={() => setIsVerificationModalOpen(false)} 
                             setFormData={setKYCFormData} 
-                            getCredentialType={getCredentialType}
+                            formType="KYC"
                             />
             <ModalOverlay/>
             <ModalContent>

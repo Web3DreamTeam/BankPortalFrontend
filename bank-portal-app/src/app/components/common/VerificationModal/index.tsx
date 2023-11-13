@@ -4,22 +4,23 @@ import { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import {BiSolidCheckCircle} from 'react-icons/bi'
 import { useDIDContext } from "@/app/context";
+import { KYBCredentials, KYCCredentials } from "@/app/utils/constants";
 
 interface VerificationModalProps {
     isOpen: boolean;
     onClose: () => void; 
-    getCredentialType:() => string[]; 
     setFormData: (data:any) => void;
+    formType:string; 
 }
 
-const VerificationModal = ({isOpen, onClose, getCredentialType, setFormData}:VerificationModalProps) => {
+const VerificationModal = ({isOpen, onClose, formType,setFormData}:VerificationModalProps) => {
     // verification process states
     const {did} = useDIDContext(); 
     const [qrData, setQRData] = useState<any>(undefined); 
     const [verified, setVerified] = useState(false);
 
     const handlePresentationRequest = async () => {
-        const data = await requestPresentation(did, getCredentialType());
+        const data = await requestPresentation(did, formType === 'KYC' ? KYCCredentials : KYBCredentials);
         console.log(data);
         setQRData(data); 
     }
@@ -68,7 +69,7 @@ const VerificationModal = ({isOpen, onClose, getCredentialType, setFormData}:Ver
                         <Stack spacing={2}>
                         <Text fontWeight={'bold'} textAlign={'center'}>Follow the Instructions</Text>
                             {(qrData && !verified) &&
-                            <Flex alignItems={'center'} flexDirection={'column'}>
+                            <Flex mb={5} alignItems={'center'} flexDirection={'column'}>
                                 <FormLabel>Scan QR</FormLabel>
                                 <QRCode size={200} value={JSON.stringify(qrData)}/>
                             </Flex>

@@ -27,12 +27,13 @@ const Navbar = () => {
                     <Divider w={'72%'} ml={12} border={'8px solid'} color={'#261803'}/>
                     <Text fontWeight={'light'} ml={12} mb={2} fontSize={32} fontFamily={'Times New Roman'} color={'#261803'}>J.P.MORGAN</Text>
                 </Flex>
-                {
-                    !did ? 
-                    <Button leftIcon={<BiLogIn/>} onClick={() => setIsLoginModalOpen(true)}  ml={'80vw'} color={'#261803'}>Login</Button> 
+                <Flex marginLeft={'75vw'} flexDirection={'row'} justifyContent={'flex-end'}>
+                    {!did ? 
+                    <Button leftIcon={<BiLogIn/>} onClick={() => setIsLoginModalOpen(true)}   color={'#261803'}>Login</Button> 
                 : 
-                    <Button leftIcon={<BiUserCircle/>} onClick={() => setIsUserModalopen(true)} ml={'80vw'} color={'#261803'}>Profile</Button>
-                }
+                    <Button leftIcon={<BiUserCircle/>} onClick={() => setIsUserModalopen(true)}  color={'#261803'}>Profile</Button>
+                    }
+                </Flex>
             </Flex>
         </Flex>
     </Flex>

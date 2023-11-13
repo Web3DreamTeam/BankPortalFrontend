@@ -52,16 +52,17 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
     }
 
     const setKYBFormData = (data:any) => {
+        console.log(data); 
         if(data.disclosed && data.disclosed.length > 0) { //sd-jwt
             setKybData({businessLicenseVC:data.disclosed[0], incomeStatementVC:kybData.incomeStatementVC})
         }
         else if (data.length > 1) {
             setKybData({businessLicenseVC:data[0].credentialSubject, incomeStatementVC: data[1].credentialSubject})
         } else {
-            if(credentialType === BusinessLicenseCredential) {
+            if(data.vp.verifiablePresentation.verifiableCredential[0].type.find((el:string) => el === BusinessLicenseCredential)) {
                 setKybData({businessLicenseVC: data[0].credentialSubject, incomeStatementVC: kybData.incomeStatementVC})
             }
-            if(credentialType === IncomeStatementCredential) {
+            if(data.vp.verifiablePresentation.verifiableCredential[0].type.find((el:string) => el === IncomeStatementCredential)) {
                 setKybData({businessLicenseVC: kybData.businessLicenseVC, incomeStatementVC: data[0].credentialSubject})
             }
         }
@@ -77,8 +78,8 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                <VerificationModal 
                             isOpen={isVerificationModalOpen} 
                             onClose={() => setIsVerificationModalOpen(false)} 
-                            setFormData={setKYBFormData} 
-                            getCredentialType={getCredentialType}
+                            setFormData={setKYBFormData}
+                            formType={'KYB'}
                             />
             <ModalOverlay/>
             <ModalContent>
