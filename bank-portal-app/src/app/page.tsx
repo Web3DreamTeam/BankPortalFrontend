@@ -26,7 +26,7 @@ export default function Home() {
       <Stack spacing={8} textAlign={'center'}>
         <Text fontSize={36}>Welcome</Text>
         <Image alignSelf={'center'} width={'60vw'} src="/toronto.jpg" alt="toronto"/>
-        <Text fontSize={24}> At J.P.MORGAN we leverage Verifiable Credentials to help you open an account in a matter of minutes.</Text>
+        <Text fontSize={24}> At Morgan Stanley we leverage Verifiable Credentials to help you open an account in a matter of minutes.</Text>
       </Stack>
     </Flex>
     <Flex w={"100%"} alignItems={'center'} flexDirection={'column'}>

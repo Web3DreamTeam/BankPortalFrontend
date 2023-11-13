@@ -24,8 +24,8 @@ const Navbar = () => {
         <Flex w={'100%'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
             <Flex alignItems={'center'} justifyContent={'space-between'}>
                 <Flex flexDirection={'column'}>
-                    <Divider w={'72%'} ml={12} border={'8px solid'} color={'#261803'}/>
-                    <Text fontWeight={'light'} ml={12} mb={2} fontSize={32} fontFamily={'Times New Roman'} color={'#261803'}>J.P.MORGAN</Text>
+                    <Divider w={'72%'} ml={12} border={'8px solid'} color={'#00001f'}/>
+                    <Text fontWeight={'light'} ml={12} mb={2} fontSize={32} fontFamily={'Times New Roman'} color={'#00001f'}>Morgan Stanley</Text>
                 </Flex>
                 <Flex marginLeft={'75vw'} flexDirection={'row'} justifyContent={'flex-end'}>
                     {!did ? 
