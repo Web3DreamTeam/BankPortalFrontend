@@ -28,15 +28,15 @@ import { useDIDContext } from "@/app/context";
 interface VerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  getCredentialType: () => string[];
   setFormData: (data: any) => void;
+  credentialType:string[]
 }
 
 const VerificationModal = ({
   isOpen,
   onClose,
-  getCredentialType,
   setFormData,
+  credentialType
 }: VerificationModalProps) => {
   // verification process states
   const { did } = useDIDContext();
@@ -44,7 +44,7 @@ const VerificationModal = ({
   const [verified, setVerified] = useState(false);
 
   const handlePresentationRequest = async () => {
-    const data = await requestPresentation(did, getCredentialType());
+    const data = await requestPresentation(did,credentialType);
     console.log(data);
     setQRData(data);
   };
@@ -52,30 +52,11 @@ const VerificationModal = ({
   const handleVerifyPresentation = async () => {
     if (qrData) {
       const data = await verifyCredentials(qrData.data.id);
-      //   if (
-      //     data &&
-      //     data.vp?.verified &&
-      //     data.disclosed &&
-      //     data.disclosed.length > 0
-      //   ) {
-      //     console.log("here");
-      //     // sd -jwt
-      //     setVerified(data.vp.verified);
-      //     // bubble up the VC data to fill the form
-      //     setFormData(data);
-      //   }
-      //   if (data && data.verified) {
-      //     console.log("here2");
-      //     setVerified(data.verified);
-      //     // bubble up the VC data to fill the form
-      //     setFormData(data.verifiablePresentation.verifiableCredential);
-      //   }
-
       if (data?.vp?.verified && data?.vp?.verifiablePresentation) {
-        setVerified(data.vp.verified);
         // bubble up the VC data to fill the form
-
-        let res = mergeDisclosuresIntoCredentials(data.vp.verifiablePresentation.verifiableCredential, data.disclosed)
+        let res = mergeDisclosuresIntoCredentials(data.vp.verifiablePresentation.verifiableCredential, data.disclosed);
+        console.log(res); 
+        setVerified(data.verified);
         setFormData(res);
       }
     }
@@ -84,15 +65,17 @@ const VerificationModal = ({
   function mergeDisclosuresIntoCredentials(credentials: any[], disclosures: any[]) {
     return credentials.map((credential, index) => {
         // Get the corresponding disclosure based on index
-        const disclosure = disclosures[index];
+        if(disclosures && disclosures.length > 0) {
+            const disclosure = disclosures[index];
 
-        // If the disclosure is not an empty object, merge it
-        if (Object.keys(disclosure).length !== 0) {
-            credential.credentialSubject = {
-                ...credential.credentialSubject,
-                ...disclosure
-            };
-            delete credential.credentialSubject._sd
+          // If the disclosure is not an empty object, merge it
+          if (Object.keys(disclosure).length !== 0) {
+              credential.credentialSubject = {
+                  ...credential.credentialSubject,
+                  ...disclosure
+              };
+              delete credential.credentialSubject._sd
+          }
         }
 
         return credential;
@@ -129,7 +112,7 @@ const VerificationModal = ({
                 Follow the Instructions
               </Text>
               {qrData && !verified && (
-                <Flex alignItems={"center"} flexDirection={"column"}>
+                <Flex alignItems={"center"} flexDirection={"column"} mb={5}>
                   <FormLabel>Scan QR</FormLabel>
                   <QRCode size={200} value={qrData.qrcodeurl} />
                 </Flex>
