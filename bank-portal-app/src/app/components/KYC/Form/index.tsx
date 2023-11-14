@@ -267,7 +267,7 @@ const handleSaveVC = async () => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.country : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "Country") : ""
                     }
                     type="text"
                     placeholder="United States"
@@ -276,7 +276,7 @@ const handleSaveVC = async () => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.state : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "State") : ""
                     }
                     type="text"
                     placeholder="New York"
@@ -285,7 +285,7 @@ const handleSaveVC = async () => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.city : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "City") : ""
                     }
                     type="text"
                     placeholder="New York"
@@ -294,7 +294,7 @@ const handleSaveVC = async () => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.address : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "Address Line") : ""
                     }
                     type="text"
                     placeholder="7th Avenue"
@@ -303,7 +303,7 @@ const handleSaveVC = async () => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.zipCode : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "Zip Code") : ""
                     }
                     type="text"
                     placeholder="M5H 2X4"
