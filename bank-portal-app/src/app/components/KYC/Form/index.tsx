@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import VerificationModal from "../../common/VerificationModal";
-import { parseDateOfBirth, parseDollarAmount } from "@/app/utils/helpers";
+import { parseAddress, parseDollarAmount } from "@/app/utils/helpers";
 import { LuPartyPopper } from "react-icons/lu";
 import {
   EmploymentCredential,
@@ -181,7 +181,7 @@ const KYCForm = ({ isOpen, onClose }: ModalProps) => {
                     variant={kycData.identityVC ? "filled" : "outline"}
                     defaultValue={
                       kycData.identityVC
-                        ? parseDateOfBirth(kycData.identityVC.dateOfBirth)
+                        ? kycData.identityVC.dateOfBirth
                         : ""
                     }
                     type="text"
@@ -209,7 +209,7 @@ const KYCForm = ({ isOpen, onClose }: ModalProps) => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.country : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "Country") : ""
                     }
                     type="text"
                     placeholder="United States"
@@ -218,7 +218,7 @@ const KYCForm = ({ isOpen, onClose }: ModalProps) => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.state : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "State") : ""
                     }
                     type="text"
                     placeholder="New York"
@@ -227,7 +227,7 @@ const KYCForm = ({ isOpen, onClose }: ModalProps) => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.city : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "City") : ""
                     }
                     type="text"
                     placeholder="New York"
@@ -236,7 +236,7 @@ const KYCForm = ({ isOpen, onClose }: ModalProps) => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.address : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "Address Line") : ""
                     }
                     type="text"
                     placeholder="7th Avenue"
@@ -245,7 +245,7 @@ const KYCForm = ({ isOpen, onClose }: ModalProps) => {
                   <Input
                     variant={kycData.addressVC ? "filled" : "outline"}
                     defaultValue={
-                      kycData.addressVC ? kycData.addressVC.zipCode : ""
+                      kycData.addressVC ? parseAddress(kycData.addressVC.accountHolderAddress, "Zip Code") : ""
                     }
                     type="text"
                     placeholder="M5H 2X4"

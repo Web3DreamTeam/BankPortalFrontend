@@ -74,10 +74,30 @@ const VerificationModal = ({
       if (data?.vp?.verified && data?.vp?.verifiablePresentation) {
         setVerified(data.vp.verified);
         // bubble up the VC data to fill the form
-        setFormData(data.vp.verifiablePresentation.verifiableCredential);
+
+        let res = mergeDisclosuresIntoCredentials(data.vp.verifiablePresentation.verifiableCredential, data.disclosed)
+        setFormData(res);
       }
     }
   };
+
+  function mergeDisclosuresIntoCredentials(credentials: any[], disclosures: any[]) {
+    return credentials.map((credential, index) => {
+        // Get the corresponding disclosure based on index
+        const disclosure = disclosures[index];
+
+        // If the disclosure is not an empty object, merge it
+        if (Object.keys(disclosure).length !== 0) {
+            credential.credentialSubject = {
+                ...credential.credentialSubject,
+                ...disclosure
+            };
+            delete credential.credentialSubject._sd
+        }
+
+        return credential;
+    });
+}
 
   useInterval(
     () => {
@@ -111,7 +131,7 @@ const VerificationModal = ({
               {qrData && !verified && (
                 <Flex alignItems={"center"} flexDirection={"column"}>
                   <FormLabel>Scan QR</FormLabel>
-                  <QRCode size={200} value={JSON.stringify(qrData)} />
+                  <QRCode size={200} value={qrData.qrcodeurl} />
                 </Flex>
               )}
               {verified && (
