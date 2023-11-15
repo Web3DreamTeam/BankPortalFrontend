@@ -23,14 +23,14 @@ const Navbar = () => {
         <Flex w={'100%'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
             <Flex alignItems={'center'} justifyContent={'space-between'}>
                 <Flex flexDirection={'column'}>
-                    <Divider w={'72%'} ml={12} border={'8px solid'} color={'#261803'}/>
-                    <Text fontWeight={'light'} ml={12} mb={2} fontSize={32} fontFamily={'Times New Roman'} color={'#261803'}>J.P.MORGAN</Text>
+                    <Divider w={'72%'} ml={12} border={'8px solid'} color={'#00001f'}/>
+                    <Text fontWeight={'light'} ml={12} mb={2} fontSize={24} fontFamily={'Times New Roman'} color={'#00001f'}>Morgan Stanley</Text>
                 </Flex>
                 {
                     !did ? 
-                    <Button leftIcon={<BiLogIn/>} onClick={() => setIsLoginModalOpen(true)}  ml={'80vw'} color={'#261803'}>Login</Button> 
+                    <Button leftIcon={<BiLogIn/>} onClick={() => setIsLoginModalOpen(true)}  ml={'80vw'} color={'##00001f'}>Login</Button> 
                 : 
-                    <Button leftIcon={<BiUserCircle/>} onClick={() => setIsUserModalopen(true)} ml={'80vw'} color={'#261803'}>Profile</Button>
+                    <Button leftIcon={<BiUserCircle/>} onClick={() => setIsUserModalopen(true)} ml={'80vw'} color={'#00001f'}>Profile</Button>
                 }
             </Flex>
         </Flex>

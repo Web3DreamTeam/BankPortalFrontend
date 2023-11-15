@@ -23,11 +23,11 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
     const [progress, setProgress] =  useState(0);
 
     //credentials state
-    const [credentialType, setCredentialType] = useState('');
+    const [applicationCredential, setApplicationCredential] = useState<string[]>([]);
     const [kybData, setKybData] = useState<KYB>({businessLicenseVC: undefined, incomeStatementVC: undefined})
 
-     const handleAutofill = (cType:string) => {
-         setCredentialType(cType);
+     const handleAutofill = (cType:string[]) => {
+         setApplicationCredential(cType);
          setIsVerificationModalOpen(true);  
      }
  
@@ -42,26 +42,14 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
         setProgress(base*multiplier); 
     }
 
-    const getCredentialType = () => {
-        if(credentialType === 'KYB')
-            // pass an array containing all the credentials required for the KYC verification
-            return KYBCredentials; 
-        else { // return the specific credential
-            return [credentialType]
-        }
-    }
-
     const setKYBFormData = (data:any) => {
-        if(data.disclosed && data.disclosed.length > 0) { //sd-jwt
-            setKybData({businessLicenseVC:data.disclosed[0], incomeStatementVC:kybData.incomeStatementVC})
-        }
-        else if (data.length > 1) {
+        if (data.length > 1) {
             setKybData({businessLicenseVC:data[0].credentialSubject, incomeStatementVC: data[1].credentialSubject})
         } else {
-            if(credentialType === BusinessLicenseCredential) {
+            if(data[0].type.find((el:string) => el === BusinessLicenseCredential)) {
                 setKybData({businessLicenseVC: data[0].credentialSubject, incomeStatementVC: kybData.incomeStatementVC})
             }
-            if(credentialType === IncomeStatementCredential) {
+            if(data[0].type.find((el:string) => el === IncomeStatementCredential)) {
                 setKybData({businessLicenseVC: kybData.businessLicenseVC, incomeStatementVC: data[0].credentialSubject})
             }
         }
@@ -78,7 +66,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                             isOpen={isVerificationModalOpen} 
                             onClose={() => setIsVerificationModalOpen(false)} 
                             setFormData={setKYBFormData} 
-                            getCredentialType={getCredentialType}
+                            credentialType={applicationCredential}
                             />
             <ModalOverlay/>
             <ModalContent>
@@ -94,7 +82,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                             width={'100%'}
                             variant={kybData.businessLicenseVC && kybData.incomeStatementVC ? 'outline' : 'solid'} 
                             isDisabled={kybData.businessLicenseVC && kybData.incomeStatementVC} 
-                            onClick={() => handleAutofill('KYB')} 
+                            onClick={() => handleAutofill(KYBCredentials)} 
                             m={4} 
                             backgroundColor={'whitesmoke'} 
                             color={'#261803'}
@@ -161,7 +149,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Button 
                                     variant={kybData.businessLicenseVC ? 'outline' : 'solid'} 
                                     isDisabled={kybData.businessLicenseVC && kybData.businessLicenseVC.licenseNumber} 
-                                    onClick={() => handleAutofill("BusinessLicenseCredential")} 
+                                    onClick={() => handleAutofill([BusinessLicenseCredential])} 
                                     mb={4} backgroundColor={'whitesmoke'} 
                                     color={'#261803'}
                                     >
@@ -197,7 +185,7 @@ const KYBForm = ({isOpen, onClose}:ModalProps) => {
                                 <Button 
                                     variant={kybData.incomeStatementVC ? 'outline' : 'solid'} 
                                     isDisabled={!!kybData.incomeStatementVC} 
-                                    onClick={() => handleAutofill("IncomeStatementCredential")} 
+                                    onClick={() => handleAutofill([IncomeStatementCredential])} 
                                     mb={4} 
                                     backgroundColor={'whitesmoke'} 
                                     color={'#261803'}

@@ -1,5 +1,5 @@
 export const KYCCredentials = ['PassportCredential', 'UtilityBillCredential','EmploymentCredential']; 
-export const KYBCredentials = ['BusinessLicenseCredential', 'IncomeStatementCredential','ReusableKYBCredential'];
+export const KYBCredentials = ['BusinessLicenseCredential', 'IncomeStatementCredential'];
 
 export const verifierUsername = 'JPM'; 
 

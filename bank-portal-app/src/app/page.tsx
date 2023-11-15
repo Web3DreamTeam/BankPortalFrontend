@@ -26,7 +26,7 @@ export default function Home() {
       <Stack spacing={8} textAlign={'center'}>
         <Text fontSize={36}>Welcome</Text>
         <Image alignSelf={'center'} width={'60vw'} src="/toronto.jpg" alt="toronto"/>
-        <Text fontSize={24}> At J.P.MORGAN we leverage Verifiable Credentials to help you open an account in a matter of minutes.</Text>
+        <Text fontSize={24}> At Morgan Stanley we leverage Verifiable Credentials to help you open an account in a matter of minutes.</Text>
       </Stack>
     </Flex>
     <Flex w={"100%"} alignItems={'center'} flexDirection={'column'}>
@@ -35,7 +35,7 @@ export default function Home() {
         <Button m={5} color={'#261803'} variant={'outline'} onClick={handleKYBForm}>Start Business Application Now</Button>
         <Button m={5} color={'#261803'} variant={'outline'} onClick={handleKYCForm}>Start Individual Application Now</Button>
       </Flex>
-      <Image alignSelf={'center'} height={512} src="/credit_cards.jpg"  alt="credit cads" ></Image>
+      <Image alignSelf={'center'} height={512} src="/credit_cards.png"  alt="credit cads" ></Image>
     </Flex>
     </Stack>
     <Footer/>

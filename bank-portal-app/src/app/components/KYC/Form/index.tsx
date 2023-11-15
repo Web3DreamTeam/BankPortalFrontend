@@ -397,7 +397,7 @@ const handleSaveVC = async () => {
                         </Stack>:
                         <Flex flexDirection={'column'} alignItems={'center'}>
                             <Stack spacing={4}>
-                                <Image alignSelf={'center'} height={256} src="/credit_card.png"  alt="credit card" ></Image>
+                                <Image alignSelf={'center'} height={256} src="/credit_card.jpeg"  alt="credit card" ></Image>
                                 <Icon alignSelf={'center'} boxSize={100} color={'green.400'} as={BiSolidCheckCircle}></Icon>
                             </Stack>
                         </Flex>
